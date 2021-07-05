@@ -69,4 +69,50 @@ aws s3 \
 cp /var/log/apache2/tmp/${fileName}.tar \
 s3://${s3_bucket}
 
+#Book keeping
+
+size=$(wc -c /var/log/apache2/tmp/$fileName.tar | awk '{print $1}')
+#test -f /var/www/html/inventory.html && echo "$FILE exists."
+
+file="/var/www/html/inventory.html"
+if [[ -f /var/www/html/inventory.html ]]
+then
+         echo "$file exist."
+else
+        touch /var/www/html/inventory.html
+        echo "Log Type Date Created Type Size" >> /var/www/html/inventory.html
+        echo " file created"
+        echo "<br>" >> /var/www/html/inventory.html
+fi
+
+echovar="  "
+#echo "Size  = $size bytes."
+#echo " " >>  /var/www/html/inventory.html
+echo "httpd-logs" >> /var/www/html/inventory.html
+echo "$echovar" >> /var/www/html/inventory.html
+
+echo "$timestamp" >> /var/www/html/inventory.html
+echo "$echovar" >> /var/www/html/inventory.html
+
+echo "tar" >> /var/www/html/inventory.html
+echo "$echovar" >> /var/www/html/inventory.html
+
+echo "$size bytes" >> /var/www/html/inventory.html
+echo " <br>"  >>  /var/www/html/inventory.html
+
+
+#Adding cronjob
+
+crontab -l
+cronStatus=$?
+#echo $?
+
+if [ $cronStatus -ne 0 ]
+then
+        echo "Currently there is no crontab for root. Adding Cronjob for root."
+        touch /etc/cron.d/automation
+        echo "0 0 * * * /bin/bash /root/Automation_Project/automation.sh" >> /etc/cron.d/automation
+        crontab /etc/cron.d/automation
+        chmod 744 /root/Automation_Project/automation.sh
+fi
 
